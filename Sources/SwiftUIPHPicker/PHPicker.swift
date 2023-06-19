@@ -46,7 +46,7 @@ extension PHPicker: UIViewControllerRepresentable {
 }
 #endif
 
-#if canImport(Cocoa)
+#if canImport(Cocoa) && os(macOS)
 import Cocoa
 
 extension PHPicker: NSViewControllerRepresentable {
@@ -87,7 +87,7 @@ extension PHPicker {
         }
         #endif
         
-        #if canImport(Cocoa)
+        #if canImport(Cocoa) && os(macOS)
         @available(macOS 13.0, *)
         public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             picker.parent?.dismiss(picker)
