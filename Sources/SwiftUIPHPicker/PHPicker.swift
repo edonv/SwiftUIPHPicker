@@ -120,5 +120,66 @@ extension PHPicker {
             }
         }
         #endif
+        
+        /// https://christianselig.com/2020/09/phpickerviewcontroller-efficiently/
+        private func decodeResults(_ results: [PHPickerResult]) -> [Data] {
+            let dispatchQueue = DispatchQueue(label: "com.ValdmanWorks.SwiftUIPHPicker.ImageSelectionQueue")
+            var selectedImageDataArr = [Data?](repeating: nil, count: results.count)
+            var totalConversionsCompleted = 0
+            
+            for (index, result) in results.enumerated() {
+                result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { (url, error) in
+                    guard let url else {
+                        dispatchQueue.sync { totalConversionsCompleted += 1 }
+                        return
+                    }
+                    
+                    let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+                    
+                    guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else {
+                        dispatchQueue.sync { totalConversionsCompleted += 1 }
+                        return
+                    }
+                    
+                    let downsampleOptions = [
+                        kCGImageSourceCreateThumbnailFromImageAlways: true as Any,
+                        kCGImageSourceCreateThumbnailWithTransform: true as Any,
+                        kCGImageSourceThumbnailMaxPixelSize: 2_000 as Any,
+                    ] as CFDictionary
+                    
+                    guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else {
+                        dispatchQueue.sync { totalConversionsCompleted += 1 }
+                        return
+                    }
+                    
+                    let data = NSMutableData()
+                    
+                    guard let imageDestination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
+                        dispatchQueue.sync { totalConversionsCompleted += 1 }
+                        return
+                    }
+                    
+                    // Don't compress PNGs
+                    let isPNG: Bool = {
+                        guard let utType = cgImage.utType else { return false }
+                        return (utType as String) == UTType.png.identifier
+                    }()
+                    
+                    let destinationProperties = [
+                        kCGImageDestinationLossyCompressionQuality: isPNG ? 1.0 : 0.75
+                    ] as CFDictionary
+                    
+                    CGImageDestinationAddImage(imageDestination, cgImage, destinationProperties)
+                    CGImageDestinationFinalize(imageDestination)
+                    
+                    dispatchQueue.sync {
+                        selectedImageDataArr[index] = data as Data
+                        totalConversionsCompleted += 1
+                    }
+                }
+            }
+            
+            return selectedImageDataArr.compactMap { $0 }
+        }
     }
 }
