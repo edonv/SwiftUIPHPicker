@@ -9,11 +9,11 @@ import PhotosUI
 import SwiftUI
 
 public struct PHPicker {
-    @Binding var image: Image?
+    @Binding var selections: [Data]
     private var configuration: PHPickerConfiguration
     
-    public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil) {
-        self._image = image
+    public init(selections: Binding<[Data]>, photoLibrary: PHPhotoLibrary? = nil) {
+        self._selections = selections
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
         } else {
@@ -21,8 +21,8 @@ public struct PHPicker {
         }
     }
     
-    public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
-        self._image = image
+    public init(selections: Binding<[Data]>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
+        self._selections = selections
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
         } else {
@@ -31,8 +31,8 @@ public struct PHPicker {
         configurationHandler(&configuration)
     }
     
-    public init(image: Binding<Image?>, configuration: PHPickerConfiguration) {
-        self._image = image
+    public init(selections: Binding<[Data]>, configuration: PHPickerConfiguration) {
+        self._selections = selections
         self.configuration = configuration
     }
     
@@ -85,41 +85,39 @@ extension PHPicker {
             self.parent = parent
         }
         
-        #if canImport(UIKit)
-        @available(iOS 14.0, *)
+//        #if canImport(UIKit)
+//        @available(iOS 14.0, *)
         public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            #if canImport(UIKit) && (os(iOS) || targetEnvironment(macCatalyst))
             picker.dismiss(animated: true)
+            #endif
             
-            guard let provider = results.first?.itemProvider else { return }
-            
-            if provider.canLoadObject(ofClass: UIImage.self) {
-                provider.loadObject(ofClass: UIImage.self) { uiImage, _ in
-                    if let image = uiImage as? UIImage {
-                        DispatchQueue.main.async {
-                            self.parent.image = Image(uiImage: image)
-                        }
-                    }
-                }
-            }
-        }
-        #endif
-        
-        #if canImport(Cocoa) && os(macOS)
-        @available(macOS 13.0, *)
-        public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            #if canImport(Cocoa) && os(macOS)
             picker.parent?.dismiss(picker)
+            #endif
             
-            guard let provider = results.first?.itemProvider else { return }
-            
-            if provider.canLoadObject(ofClass: NSImage.self) {
-                provider.loadObject(ofClass: NSImage.self) { nsImage, _ in
-                    if let image = nsImage as? NSImage {
-                        self.parent.image = Image(nsImage: image)
-                    }
-                }
+            DispatchQueue.main.async {
+                self.parent.selections = self.decodeResults(results)
             }
         }
-        #endif
+//        #endif
+
+//        #if canImport(Cocoa) && os(macOS)
+//        @available(macOS 13.0, *)
+//        public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+//            picker.parent?.dismiss(picker)
+//
+//            guard let provider = results.first?.itemProvider else { return }
+//
+//            if provider.canLoadObject(ofClass: NSImage.self) {
+//                provider.loadObject(ofClass: NSImage.self) { nsImage, _ in
+//                    if let image = nsImage as? NSImage {
+//                        self.parent.image = Image(nsImage: image)
+//                    }
+//                }
+//            }
+//        }
+//        #endif
         
         /// https://christianselig.com/2020/09/phpickerviewcontroller-efficiently/
         private func decodeResults(_ results: [PHPickerResult]) -> [Data] {
