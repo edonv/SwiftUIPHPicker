@@ -96,7 +96,7 @@ extension PHPicker {
             picker.parent?.dismiss(picker)
             #endif
             
-            Task.detached {
+            Task {
                 await self.parent.selections = self.decodeResults(results)
             }
         }
