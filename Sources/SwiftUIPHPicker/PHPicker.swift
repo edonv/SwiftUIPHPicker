@@ -28,6 +28,11 @@ public struct PHPicker {
         configurationHandler(&configuration)
     }
     
+    public init(image: Binding<Image?>, configuration: PHPickerConfiguration) {
+        self._image = image
+        self.configuration = configuration
+    }
+    
     @Binding var image: Image?
     private var configuration: PHPickerConfiguration
     
