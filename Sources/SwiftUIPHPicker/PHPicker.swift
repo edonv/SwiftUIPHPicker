@@ -9,7 +9,7 @@ import PhotosUI
 import SwiftUI
 
 public struct PHPicker {
-    public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil, configuration: PHPickerConfiguration) {
+    public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil, configuration: PHPickerConfiguration = PHPickerConfiguration()) {
         self._image = image
         self.photoLibrary = photoLibrary
         self.configuration = configuration
