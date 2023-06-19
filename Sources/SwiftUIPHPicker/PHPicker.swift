@@ -80,7 +80,9 @@ extension PHPicker {
             if provider.canLoadObject(ofClass: UIImage.self) {
                 provider.loadObject(ofClass: UIImage.self) { uiImage, _ in
                     if let image = uiImage as? UIImage {
-                        self.parent.image = Image(uiImage: image)
+                        DispatchQueue.main.async {
+                            self.parent.image = Image(uiImage: image)
+                        }
                     }
                 }
             }
