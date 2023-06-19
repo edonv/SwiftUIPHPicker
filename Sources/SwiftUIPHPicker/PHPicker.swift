@@ -9,6 +9,9 @@ import PhotosUI
 import SwiftUI
 
 public struct PHPicker {
+    @Binding var image: Image?
+    private var configuration: PHPickerConfiguration
+    
     public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil) {
         self._image = image
         if let photoLibrary {
@@ -32,9 +35,6 @@ public struct PHPicker {
         self._image = image
         self.configuration = configuration
     }
-    
-    @Binding var image: Image?
-    private var configuration: PHPickerConfiguration
     
     public func makeCoordinator() -> Coordinator {
         Coordinator(self)
