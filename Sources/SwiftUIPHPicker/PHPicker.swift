@@ -18,7 +18,11 @@ public struct PHPicker {
     public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
         self._image = image
         self.photoLibrary = photoLibrary
-        self.configuration = PHPickerConfiguration()
+        if let photoLibrary {
+            self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
+        } else {
+            self.configuration = PHPickerConfiguration()
+        }
         configurationHandler(&configuration)
     }
     
