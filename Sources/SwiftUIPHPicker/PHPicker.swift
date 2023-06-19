@@ -177,7 +177,9 @@ extension PHPicker {
                 }
             }
             
-            return selectedImageDataArr.compactMap { $0 }
+            return dispatchQueue.sync {
+                selectedImageDataArr.compactMap { $0 }
+            }
         }
     }
 }
