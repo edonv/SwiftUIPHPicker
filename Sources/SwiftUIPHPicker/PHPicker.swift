@@ -96,8 +96,8 @@ extension PHPicker {
             picker.parent?.dismiss(picker)
             #endif
             
-            DispatchQueue.main.async {
-                self.parent.selections = self.decodeResults(results)
+            Task.detached {
+                await self.parent.selections = self.decodeResults(results)
             }
         }
 //        #endif
@@ -120,23 +120,29 @@ extension PHPicker {
 //        #endif
         
         /// https://christianselig.com/2020/09/phpickerviewcontroller-efficiently/
-        private func decodeResults(_ results: [PHPickerResult]) -> [Data] {
-            let dispatchQueue = DispatchQueue(label: "com.ValdmanWorks.SwiftUIPHPicker.ImageSelectionQueue")
+        private func decodeResults(_ results: [PHPickerResult]) async -> [Data] {
+//            let dispatchQueue = DispatchQueue(label: "com.ValdmanWorks.SwiftUIPHPicker.ImageSelectionQueue")
             var selectedImageDataArr = [Data?](repeating: nil, count: results.count)
             var totalConversionsCompleted = 0
             
             for (index, result) in results.enumerated() {
-                result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { (url, error) in
-                    guard let url else {
-                        dispatchQueue.sync { totalConversionsCompleted += 1 }
-                        return
-                    }
+                do {
+                    let url = try await result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier)
+                    
+                    //                result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { (url, error) in
+//                    guard let url else {
+//                        dispatchQueue.sync { totalConversionsCompleted += 1 }
+//                        return
+//                    }
                     
                     let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
                     
                     guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else {
-                        dispatchQueue.sync { totalConversionsCompleted += 1 }
-                        return
+//                        dispatchQueue.sync {
+                        totalConversionsCompleted += 1
+//                        }
+//                        return
+                        continue
                     }
                     
                     let downsampleOptions = [
@@ -146,15 +152,21 @@ extension PHPicker {
                     ] as CFDictionary
                     
                     guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else {
-                        dispatchQueue.sync { totalConversionsCompleted += 1 }
-                        return
+//                        dispatchQueue.sync {
+                        totalConversionsCompleted += 1
+//                        }
+//                        return
+                        continue
                     }
                     
                     let data = NSMutableData()
                     
                     guard let imageDestination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
-                        dispatchQueue.sync { totalConversionsCompleted += 1 }
-                        return
+//                        dispatchQueue.sync {
+                        totalConversionsCompleted += 1
+//                        }
+//                        return
+                        continue
                     }
                     
                     // Don't compress PNGs
@@ -170,16 +182,19 @@ extension PHPicker {
                     CGImageDestinationAddImage(imageDestination, cgImage, destinationProperties)
                     CGImageDestinationFinalize(imageDestination)
                     
-                    dispatchQueue.sync {
+//                    dispatchQueue.sync {
                         selectedImageDataArr[index] = data as Data
                         totalConversionsCompleted += 1
-                    }
+//                    }
+//                }
+                } catch {
+                    totalConversionsCompleted += 1
                 }
             }
             
-            return dispatchQueue.sync {
-                selectedImageDataArr.compactMap { $0 }
-            }
+//            return dispatchQueue.sync {
+            return selectedImageDataArr.compactMap { $0 }
+//            }
         }
     }
 }
