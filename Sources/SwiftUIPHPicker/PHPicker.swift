@@ -10,7 +10,7 @@ import SwiftUI
 
 public struct PHPicker {
     @Binding var selections: [Data]
-    private var configuration: PHPickerConfiguration
+    private(set) var configuration: PHPickerConfiguration
     
     public init(selections: Binding<[Data]>, photoLibrary: PHPhotoLibrary? = nil) {
         self._selections = selections
