@@ -11,7 +11,6 @@ import SwiftUI
 public struct PHPicker {
     public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil) {
         self._image = image
-        self.photoLibrary = photoLibrary
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
         } else {
@@ -21,7 +20,6 @@ public struct PHPicker {
     
     public init(image: Binding<Image?>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
         self._image = image
-        self.photoLibrary = photoLibrary
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
         } else {
@@ -31,9 +29,6 @@ public struct PHPicker {
     }
     
     @Binding var image: Image?
-    
-    let photoLibrary: PHPhotoLibrary?
-    
     private var configuration: PHPickerConfiguration
     
     public func makeCoordinator() -> Coordinator {
