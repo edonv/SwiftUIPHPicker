@@ -49,8 +49,6 @@ public struct PHPicker {
 import UIKit
 
 extension PHPicker: UIViewControllerRepresentable {
-    public typealias PHImage = UIImage
-    
     public func makeUIViewController(context: Context) -> PHPickerViewController {
         let picker = PHPickerViewController(configuration: self.configuration)
         picker.delegate = context.coordinator
@@ -67,8 +65,6 @@ extension PHPicker: UIViewControllerRepresentable {
 import Cocoa
 
 extension PHPicker: NSViewControllerRepresentable {
-    public typealias PHImage = NSImage
-    
     public func makeNSViewController(context: Context) -> PHPickerViewController {
         let picker = PHPickerViewController(configuration: self.configuration)
         picker.delegate = context.coordinator
