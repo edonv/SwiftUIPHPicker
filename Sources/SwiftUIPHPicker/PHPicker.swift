@@ -9,10 +9,10 @@ import PhotosUI
 import SwiftUI
 
 public struct PHPicker {
-    @Binding var selections: [Data]
+    @Binding var selections: [PHImage]
     private(set) var configuration: PHPickerConfiguration
     
-    public init(selections: Binding<[Data]>, photoLibrary: PHPhotoLibrary? = nil) {
+    public init(selections: Binding<[PHImage]>, photoLibrary: PHPhotoLibrary? = nil) {
         self._selections = selections
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
@@ -21,7 +21,7 @@ public struct PHPicker {
         }
     }
     
-    public init(selections: Binding<[Data]>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
+    public init(selections: Binding<[PHImage]>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
         self._selections = selections
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
@@ -31,7 +31,7 @@ public struct PHPicker {
         configurationHandler(&configuration)
     }
     
-    public init(selections: Binding<[Data]>, configuration: PHPickerConfiguration) {
+    public init(selections: Binding<[PHImage]>, configuration: PHPickerConfiguration) {
         self._selections = selections
         self.configuration = configuration
     }
@@ -100,9 +100,7 @@ extension PHPicker {
             picker.parent?.dismiss(picker)
             #endif
             
-            Task {
-                await self.parent.selections = self.decodeResults(results)
-            }
+            asyncLoadSelectedImages(from: results)
         }
 //        #endif
 
