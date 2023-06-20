@@ -12,7 +12,7 @@ extension NSItemProvider {
         forTypeIdentifier typeIdentifier: String
     ) async throws -> URL {
         return try await withCheckedThrowingContinuation { continuation in
-            _ = loadFileRepresentation(forTypeIdentifier: typeIdentifier) { (url, error) in
+            loadFileRepresentation(forTypeIdentifier: typeIdentifier) { (url, error) in
                 if let url {
                     continuation.resume(returning: url)
                 } else if let error {
