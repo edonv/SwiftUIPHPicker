@@ -122,6 +122,22 @@ extension PHPicker {
 //            }
 //        }
 //        #endif
+
+        private func asyncLoadSelectedImages(from results: [PHPickerResult]) {
+            Task {
+                do {
+                    parent.selections = try await withThrowingTaskGroup(of: PHImage.self, returning: [PHImage].self) { taskGroup in
+                        for result in results {
+                            taskGroup.addTask { try await result.itemProvider.loadObject(ofClass: PHImage.self) }
+                        }
+                        
+                        return try await taskGroup.reduce(into: []) { $0.append($1) }
+                    }
+                } catch {
+                    print("Error loading selections:", error as NSError)
+                }
+            }
+        }
         
         /// https://christianselig.com/2020/09/phpickerviewcontroller-efficiently/
         private func decodeResults(_ results: [PHPickerResult]) async -> [Data] {
