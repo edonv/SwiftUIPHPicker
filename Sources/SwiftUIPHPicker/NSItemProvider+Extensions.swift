@@ -8,20 +8,6 @@
 import Foundation
 
 extension NSItemProvider {
-    public func loadFileRepresentation(
-        forTypeIdentifier typeIdentifier: String
-    ) async throws -> URL {
-        return try await withCheckedThrowingContinuation { continuation in
-            loadFileRepresentation(forTypeIdentifier: typeIdentifier) { (url, error) in
-                if let url {
-                    continuation.resume(returning: url)
-                } else if let error {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-    
     public func loadObject<T>(
         ofClass aClass: T.Type
     ) async throws -> T where T : NSItemProviderReading {
