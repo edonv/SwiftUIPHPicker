@@ -8,6 +8,48 @@
 import PhotosUI
 import SwiftUI
 
+extension View {
+    public func phPicker(
+        isPresented: Binding<Bool>,
+        selection: Binding<[PHPicker.PHImage]>,
+        maxSelectionCount: Int? = nil,
+        matching filter: PHPickerFilter? = nil,
+        preferredAssetRepresentationMode: PHPickerConfiguration.AssetRepresentationMode = .automatic,
+        photoLibrary: PHPhotoLibrary
+    ) -> some View {
+//        } else {
+        self
+            .sheet(isPresented: isPresented) {
+                PHPicker(selections: selection, photoLibrary: photoLibrary) { config in
+                    config.selectionLimit = maxSelectionCount ?? 0
+                    config.filter = filter
+                    config.preferredAssetRepresentationMode = preferredAssetRepresentationMode
+                }
+            }
+    }
+    
+    @available(iOS 15, macCatalyst 15, macOS 13, *)
+    public func phPicker(
+        isPresented: Binding<Bool>,
+        selection: Binding<[PHPicker.PHImage]>,
+        maxSelectionCount: Int? = nil,
+        selectionBehavior: PHPickerConfiguration.Selection = .default,
+        matching filter: PHPickerFilter? = nil,
+        preferredAssetRepresentationMode: PHPickerConfiguration.AssetRepresentationMode = .automatic,
+        photoLibrary: PHPhotoLibrary
+    ) -> some View {
+        self
+            .sheet(isPresented: isPresented) {
+                PHPicker(selections: selection, photoLibrary: photoLibrary) { config in
+                    config.selectionLimit = maxSelectionCount ?? 0
+                    config.selection = selectionBehavior
+                    config.filter = filter
+                    config.preferredAssetRepresentationMode = preferredAssetRepresentationMode
+                }
+            }
+    }
+}
+
 extension View where Self == PHPicker {
     @available(iOS 15, macCatalyst 15, macOS 13, *)
     public func updatingConfiguration(
