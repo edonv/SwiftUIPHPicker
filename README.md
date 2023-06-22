@@ -1,5 +1,8 @@
 # SwiftUIPHPicker
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fedonv%2FSwiftUIPHPicker%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/edonv/SwiftUIPHPicker)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fedonv%2FSwiftUIPHPicker%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/edonv/SwiftUIPHPicker)
+
 `SwiftUI` wrapper of [`PhotoKit`](https://developer.apple.com/documentation/photokit)'s [`PHPickerViewController`](https://developer.apple.com/documentation/photokit/phpickerviewcontroller).  
 
 The majority of the base of the code came from Hacking With Swift's post on this very topic: <https://www.hackingwithswift.com/books/ios-swiftui/importing-an-image-into-swiftui-using-phpickerviewcontroller>.
