@@ -118,14 +118,14 @@ extension PHPicker {
                                 // Different file types
                                 if provider.canLoadObject(ofClass: PHImage.self) {
                                     let image = try await provider.loadObject(ofClass: PHImage.self)
-                                    return .photo(image)
+                                    return .photo(fileName: provider.suggestedName, image: image)
                                 } else if checkIfProviderIsLivePhoto(provider) {
                                     // For some reason, PHLivePhoto is not supported in this way on macOS
                                     #if canImport(Cocoa) && os(macOS)
                                     return nil
                                     #else
                                     let livePhoto = try await provider.loadObject(ofClass: PHLivePhoto.self)
-                                    return .livePhoto(livePhoto)
+                                    return .livePhoto(fileName: provider.suggestedName, image: livePhoto)
                                     #endif
                                 } else if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
                                     // TODO: This path needs testing
