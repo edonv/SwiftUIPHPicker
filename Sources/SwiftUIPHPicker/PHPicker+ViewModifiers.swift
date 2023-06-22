@@ -17,7 +17,6 @@ extension View {
         preferredAssetRepresentationMode: PHPickerConfiguration.AssetRepresentationMode = .automatic,
         photoLibrary: PHPhotoLibrary
     ) -> some View {
-//        } else {
         self
             .sheet(isPresented: isPresented) {
                 PHPicker(selections: selection, photoLibrary: photoLibrary) { config in
