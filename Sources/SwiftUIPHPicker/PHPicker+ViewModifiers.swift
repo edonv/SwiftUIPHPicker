@@ -11,7 +11,7 @@ import SwiftUI
 extension View {
     public func phPicker(
         isPresented: Binding<Bool>,
-        selection: Binding<[PHPicker.PHImage]>,
+        selection: Binding<[PHSelectedObject]>,
         maxSelectionCount: Int? = nil,
         matching filter: PHPickerFilter? = nil,
         preferredAssetRepresentationMode: PHPickerConfiguration.AssetRepresentationMode = .automatic,
@@ -31,7 +31,7 @@ extension View {
     @available(iOS 15, macCatalyst 15, macOS 13, *)
     public func phPicker(
         isPresented: Binding<Bool>,
-        selection: Binding<[PHPicker.PHImage]>,
+        selection: Binding<[PHSelectedObject]>,
         maxSelectionCount: Int? = nil,
         selectionBehavior: PHPickerConfiguration.Selection = .default,
         matching filter: PHPickerFilter? = nil,
