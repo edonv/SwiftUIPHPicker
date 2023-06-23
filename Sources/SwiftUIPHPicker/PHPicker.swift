@@ -9,10 +9,10 @@ import PhotosUI
 import SwiftUI
 
 public struct PHPicker {
-    @Binding var selections: [PHImage]
+    @Binding var selections: [PHSelectedObject]
     private(set) var configuration: PHPickerConfiguration
     
-    public init(selections: Binding<[PHImage]>, photoLibrary: PHPhotoLibrary? = nil) {
+    public init(selections: Binding<[PHSelectedObject]>, photoLibrary: PHPhotoLibrary? = nil) {
         self._selections = selections
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
@@ -21,7 +21,7 @@ public struct PHPicker {
         }
     }
     
-    public init(selections: Binding<[PHImage]>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
+    public init(selections: Binding<[PHSelectedObject]>, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: (_ config: inout PHPickerConfiguration) -> Void) {
         self._selections = selections
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
@@ -31,7 +31,7 @@ public struct PHPicker {
         configurationHandler(&configuration)
     }
     
-    public init(selections: Binding<[PHImage]>, configuration: PHPickerConfiguration) {
+    public init(selections: Binding<[PHSelectedObject]>, configuration: PHPickerConfiguration) {
         self._selections = selections
         self.configuration = configuration
     }
@@ -100,12 +100,48 @@ extension PHPicker {
         private func asyncLoadSelectedImages(from results: [PHPickerResult]) {
             Task {
                 do {
-                    parent.selections = try await withThrowingTaskGroup(of: PHImage.self, returning: [PHImage].self) { taskGroup in
+                    parent.selections = try await withThrowingTaskGroup(of: PHSelectedObject?.self,
+                                                                        returning: [PHSelectedObject].self) { taskGroup in
                         for result in results {
-                            taskGroup.addTask { try await result.itemProvider.loadObject(ofClass: PHImage.self) }
+                            taskGroup.addTask {
+                                let provider = result.itemProvider
+                                
+                                // Define functions for platform-specific behavior
+                                let checkIfProviderIsLivePhoto = { (_ provider: NSItemProvider) -> Bool in
+                                    #if canImport(Cocoa) && os(macOS)
+                                    return false
+                                    #else
+                                    return provider.canLoadObject(ofClass: PHLivePhoto.self)
+                                    #endif
+                                }
+                                
+                                // Different file types
+                                if provider.canLoadObject(ofClass: PHImage.self) {
+                                    let image = try await provider.loadObject(ofClass: PHImage.self)
+                                    return .photo(fileName: provider.suggestedName, image: image)
+                                } else if checkIfProviderIsLivePhoto(provider) {
+                                    // For some reason, PHLivePhoto is not supported in this way on macOS
+                                    #if canImport(Cocoa) && os(macOS)
+                                    return nil
+                                    #else
+                                    let livePhoto = try await provider.loadObject(ofClass: PHLivePhoto.self)
+                                    return .livePhoto(fileName: provider.suggestedName, image: livePhoto)
+                                    #endif
+                                } else if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+                                    // TODO: This path needs testing
+                                    let videoURL = try await provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier)
+                                    return .video(videoURL)
+                                } else {
+                                    print("Result can not be loaded as an image, a live photo, or a video:",
+                                          result.assetIdentifier as Any)
+                                    return nil
+                                }
+                            }
                         }
                         
-                        return try await taskGroup.reduce(into: []) { $0.append($1) }
+                        return try await taskGroup
+                            .compactMap { $0 }
+                            .reduce(into: []) { $0.append($1) }
                     }
                 } catch {
                     print("Error loading selections:", error as NSError)
