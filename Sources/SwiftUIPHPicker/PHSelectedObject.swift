@@ -10,7 +10,7 @@ import Photos
 
 /// A container type for storing different types of resulting selections from ``PHPicker``.
 public enum PHSelectedObject {
-    /// Contains a ``PHPicker/PHImage`` (which is just `NSImage` on macOS and `UIImage` on iOS/macCatalyst.
+    /// Contains a ``PHPicker/PHImage`` (which is just `NSImage` on macOS and `UIImage` on iOS/macCatalyst).
     case photo(fileName: String?, image: PHPicker.PHImage)
     
     /// Contains a [`PHLivePhoto`](https://developer.apple.com/documentation/photokit/phlivephoto).
