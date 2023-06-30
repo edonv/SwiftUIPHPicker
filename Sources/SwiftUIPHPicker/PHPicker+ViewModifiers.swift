@@ -15,12 +15,13 @@ extension View {
         maxSelectionCount: Int? = nil,
         matching filter: PHPickerFilter? = nil,
         preferredAssetRepresentationMode: PHPickerConfiguration.AssetRepresentationMode = .automatic,
+        keepLivePhotosIntact: Bool = true,
         photoLibrary: PHPhotoLibrary,
         onDismiss: (() -> Void)? = nil
     ) -> some View {
         self
             .sheet(isPresented: isPresented, onDismiss: onDismiss) {
-                PHPicker(selections: selection, photoLibrary: photoLibrary) { config in
+                PHPicker(selections: selection, keepLivePhotosIntact: keepLivePhotosIntact, photoLibrary: photoLibrary) { config in
                     config.selectionLimit = maxSelectionCount ?? 0
                     config.filter = filter
                     config.preferredAssetRepresentationMode = preferredAssetRepresentationMode
@@ -36,12 +37,13 @@ extension View {
         selectionBehavior: PHPickerConfiguration.Selection = .default,
         matching filter: PHPickerFilter? = nil,
         preferredAssetRepresentationMode: PHPickerConfiguration.AssetRepresentationMode = .automatic,
+        keepLivePhotosIntact: Bool = true,
         photoLibrary: PHPhotoLibrary,
         onDismiss: (() -> Void)? = nil
     ) -> some View {
         self
             .sheet(isPresented: isPresented, onDismiss: onDismiss) {
-                PHPicker(selections: selection, photoLibrary: photoLibrary) { config in
+                PHPicker(selections: selection, keepLivePhotosIntact: keepLivePhotosIntact, photoLibrary: photoLibrary) { config in
                     config.selectionLimit = maxSelectionCount ?? 0
                     config.selection = selectionBehavior
                     config.filter = filter
