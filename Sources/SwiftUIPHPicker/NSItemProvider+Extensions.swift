@@ -20,7 +20,7 @@ extension NSItemProvider {
                         let success = FileManager.default.secureCopyItem(at: url, to: newURL)
                         
                         if success {
-                            continuation.resume(returning: url)
+                            continuation.resume(returning: newURL)
                         }
                     } else {
                         continuation.resume(returning: url)
