@@ -69,7 +69,7 @@ extension PHPicker {
     ///
     /// - Note: If you want to keep the file name the same and just move it to a specific directory, you can use ``videoDestinationDirectory(_:)``.
     /// - Parameter handler: A closure for mapping the temporary `URL` to a new `URL` where the video file should be saved.
-    public func videoDestinationHandler(_ handler: ((URL) -> URL?)?) -> PHPicker {
+    public func videoDestination(_ handler: ((URL) -> URL?)?) -> PHPicker {
         var newView = self
         newView.videoDestinationHandler = handler
         return newView
@@ -84,7 +84,7 @@ extension PHPicker {
     /// - Note: If you want to generate a destination `URL` for videos differently, use ``videoDestinationHandler(_:)``.
     /// - Parameter handler: A closure for mapping the temporary `URL` to a new `URL` where the video file should be saved.
     public func videoDestinationDirectory(_ directoryURL: URL?) -> PHPicker {
-        self.videoDestinationHandler { temporaryURL in
+        self.videoDestination { temporaryURL in
             if #available(iOS 16, macCatalyst 16, macOS 13, *) {
                 return directoryURL?
                     .appending(component: temporaryURL.lastPathComponent, directoryHint: .notDirectory)
