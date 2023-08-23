@@ -9,12 +9,22 @@ import Foundation
 
 extension NSItemProvider {
     public func loadFileRepresentation(
-        forTypeIdentifier typeIdentifier: String
+        forTypeIdentifier typeIdentifier: String,
+        destinationHandler: ((URL) -> URL)? = nil
     ) async throws -> URL {
         return try await withCheckedThrowingContinuation { continuation in
             loadFileRepresentation(forTypeIdentifier: typeIdentifier) { (url, error) in
                 if let url {
-                    continuation.resume(returning: url)
+                    if let destinationHandler {
+                        let newURL = destinationHandler(url)
+                        let success = FileManager.default.secureCopyItem(at: url, to: newURL)
+                        
+                        if success {
+                            continuation.resume(returning: url)
+                        }
+                    } else {
+                        continuation.resume(returning: url)
+                    }
                 } else if let error {
                     continuation.resume(throwing: error)
                 }
