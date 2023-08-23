@@ -107,6 +107,7 @@ extension PHPicker {
         private func asyncLoadSelectedImages(from results: [PHPickerResult]) {
             let keepLivePhotosIntact = parent.keepLivePhotosIntact
             let destinationHandler = parent.videoDestinationHandler
+            
             Task { [keepLivePhotosIntact, destinationHandler] in
                 do {
                     parent.selections = try await withThrowingTaskGroup(of: PHSelectedObject?.self,
