@@ -112,7 +112,8 @@ extension PHPicker {
         
         private func asyncLoadSelectedImages(from results: [PHPickerResult]) {
             let keepLivePhotosIntact = parent.keepLivePhotosIntact
-            Task { [keepLivePhotosIntact] in
+            let destinationHandler = parent.videoDestinationHandler
+            Task { [keepLivePhotosIntact, destinationHandler] in
                 do {
                     parent.selections = try await withThrowingTaskGroup(of: PHSelectedObject?.self,
                                                                         returning: [PHSelectedObject].self) { taskGroup in
@@ -144,8 +145,10 @@ extension PHPicker {
                                     return .photo(fileName: provider.suggestedName, image: image)
                                 } else if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
                                     // TODO: This path needs testing
-                                    let videoURL = try await provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier)
-                                    return .video(videoURL)
+                                    guard let destinationHandler else { return nil }
+                                    
+                                    let url = try await provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier, destinationHandler: destinationHandler)
+                                    return .video(url)
                                 } else {
                                     print("Result can not be loaded as an image, a live photo, or a video:",
                                           result.assetIdentifier as Any)
