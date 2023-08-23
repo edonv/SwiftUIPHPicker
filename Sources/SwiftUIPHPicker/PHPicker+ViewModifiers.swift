@@ -89,7 +89,7 @@ extension PHPicker {
     ///
     /// When a video is loaded using `NSItemProvider`'s [`loadFileRepresentation(forTypeIdentifier:completionHandler:)`](https://developer.apple.com/documentation/foundation/nsitemprovider/2888338-loadfilerepresentation), the system saves the video to a temporary file. When leaving the scope of that function's `completionHandler`, the temporary file is deleted. In order to get that file, ``videoDestinationHandler`` is used to map the temporary `URL` to a new `URL` that the file will be moved to before the temporary file is deleted.
     ///
-    /// - Note: If you want to keep the file name the same and just move it to a specific directory, you can use ``setVideoDestinationDirectory(_:)``.
+    /// - Note: If you want to keep the file name the same and just move it to a specific directory, you can use ``videoDestinationDirectory(_:)``.
     /// - Parameter handler: A closure for mapping the temporary `URL` to a new `URL` where the video file should be saved.
     public func videoDestinationHandler(_ handler: ((URL) -> URL)?) -> PHPicker {
         var newView = self
@@ -105,7 +105,7 @@ extension PHPicker {
     ///
     /// - Note: If you want to generate a destination `URL` for videos differently, use ``videoDestinationHandler(_:)``.
     /// - Parameter handler: A closure for mapping the temporary `URL` to a new `URL` where the video file should be saved.
-    public func setVideoDestinationDirectory(_ directoryURL: URL) -> PHPicker {
+    public func videoDestinationDirectory(_ directoryURL: URL) -> PHPicker {
         self.videoDestinationHandler { temporaryURL in
             if #available(iOS 16, macCatalyst 16, macOS 13, *) {
                 return directoryURL
