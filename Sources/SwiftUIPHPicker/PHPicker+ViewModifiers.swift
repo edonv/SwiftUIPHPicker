@@ -53,7 +53,7 @@ extension View {
     }
 }
 
-extension View where Self == PHPicker {
+extension PHPicker {
     @available(iOS 15, macCatalyst 15, macOS 13, *)
     public func updatingConfiguration(
         filter: PHPickerFilter? = nil,
