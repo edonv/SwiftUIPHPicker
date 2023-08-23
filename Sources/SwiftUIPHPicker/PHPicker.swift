@@ -45,8 +45,10 @@ public struct PHPicker {
         Coordinator(self)
     }
     
-    internal mutating func setConfiguration(_ newConfiguration: PHPickerConfiguration) {
-        self.configuration = newConfiguration
+    public func configuration(_ handler: (_ config: inout PHPickerConfiguration) -> Void) -> PHPicker {
+        var newView = self
+        handler(&newView.configuration)
+        return newView
     }
 }
 
