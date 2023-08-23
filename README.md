@@ -12,3 +12,7 @@ I added support for more than 1 selection, as well as practical extensions, and 
 ## To-Do's
 - [x] Add support for multiple selections.
 - [ ] Add support for selecting other Live Photos and videos (currently only supports standard photos).
+
+## Usage Notes
+
+- If you'd like to support video selections, then you *must* use either the `setVideoDestinationDirectory(_:)` or `setVideoDestinationHandler(_:)` view modifier. Without them, there won't be somewhere set to save the video file and the system's temporary file will be be deleted before it's accessible.
