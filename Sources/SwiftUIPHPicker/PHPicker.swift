@@ -18,7 +18,7 @@ public struct PHPicker {
     /// This property must be used in the case of a video being selected from the picker.
     ///
     /// When a video is loaded using `NSItemProvider`'s [`loadFileRepresentation(forTypeIdentifier:completionHandler:)`](https://developer.apple.com/documentation/foundation/nsitemprovider/2888338-loadfilerepresentation), the system saves the video to a temporary file. When leaving the scope of that function's `completionHandler`, the temporary file is deleted. In order to get that file, this property is used to map the temporary `URL` to a new `URL` that the file will be moved to before the temporary file is deleted.
-    var videoDestinationHandler: ((URL) -> URL)? = nil
+    var videoDestinationHandler: ((URL) -> URL?)? = nil
     
     public init(selections: Binding<[PHSelectedObject]>, keepLivePhotosIntact: Bool = true, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: ((_ config: inout PHPickerConfiguration) -> Void)? = nil) {
         self._selections = selections
