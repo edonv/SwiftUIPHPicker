@@ -13,6 +13,28 @@ I added support for more than 1 selection, as well as practical extensions, and 
 - [x] Add support for multiple selections.
 - [ ] Add support for selecting other Live Photos and videos (currently only supports standard photos).
 
-## Usage Notes
+## Usage
+
+```
+import SwiftUI
+import SwiftUIPHPicker
+
+struct ContentView: View {
+    @State private var showPicker = false
+    @State private var pickerSelection = [PHSelectedObject]()
+    
+    var body: some View {
+        Text("Hello world!")
+            .sheet(isPresented: $showPicker) {
+                PHPicker(selections: $pickerSelection, photoLibrary: .shared())
+                    .maxSelectionCount(5)
+                    .filter(.all(of: [.images, .not(.livePhotos), .videos]))
+                    .videoDestinationDirectory(DOCUMENT DIRECTORY) /* more code needed for this */
+            }
+    }
+}
+```
+
+### Notes
 
 - If you'd like to support video selections, then you *must* use either the `setVideoDestinationDirectory(_:)` or `setVideoDestinationHandler(_:)` view modifier. Without them, there won't be somewhere set to save the video file and the system's temporary file will be be deleted before it's accessible.
