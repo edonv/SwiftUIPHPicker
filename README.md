@@ -17,7 +17,7 @@ I added support for more than 1 selection, as well as practical extensions, and 
 
 ## Usage
 
-```
+```swift
 import SwiftUI
 import SwiftUIPHPicker
 
