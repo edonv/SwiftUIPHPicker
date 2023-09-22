@@ -15,7 +15,7 @@ extension FileManager {
     @discardableResult
     func secureCopyItem(at sourceURL: URL, to destinationURL: URL) -> Bool {
         do {
-            if !FileManager.default.fileExists(atPath: destinationURL.absoluteString) {
+            if !FileManager.default.fileExists(atPath: destinationURL.path) {
                 try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
                 return true
             }
