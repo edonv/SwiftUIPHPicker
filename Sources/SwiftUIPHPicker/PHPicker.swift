@@ -31,7 +31,7 @@ public struct PHPicker {
         keepLivePhotosIntact: Bool = true,
         photoLibrary: PHPhotoLibrary? = .shared(),
         configurationHandler: ((_ config: inout PHPickerConfiguration) -> Void)? = nil,
-        onCompletion: @escaping (Result<[PHSelectedObject], Error>) -> Void
+        onCompletion: @escaping (_ result: Result<[PHSelectedObject], Error>) -> Void
     ) {
         self.keepLivePhotosIntact = keepLivePhotosIntact
         self.completionHandler = onCompletion
@@ -55,7 +55,7 @@ public struct PHPicker {
     public init(
         keepLivePhotosIntact: Bool = true,
         configuration: PHPickerConfiguration,
-        onCompletion: @escaping (_ selections: Result<[PHSelectedObject], Error>) -> Void
+        onCompletion: @escaping (_ result: Result<[PHSelectedObject], Error>) -> Void
     ) {
         self.keepLivePhotosIntact = keepLivePhotosIntact
         self.configuration = configuration
