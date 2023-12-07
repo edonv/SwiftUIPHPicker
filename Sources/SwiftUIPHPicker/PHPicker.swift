@@ -9,8 +9,9 @@ import PhotosUI
 import SwiftUI
 
 public struct PHPicker {
-    @Binding var selections: [PHSelectedObject]
     private(set) var configuration: PHPickerConfiguration
+    
+    var completionHandler: (Result<[PHSelectedObject], Error>) -> Void
     
     /// When set to `true`, selected Live Photos are returned as a ``PHSelectedObject/livePhoto(fileName:image:)``. Otherwise, they're returned in the form of a ``PHSelectedObject/photo(fileName:image:)``.
     var keepLivePhotosIntact: Bool = true
@@ -20,9 +21,14 @@ public struct PHPicker {
     /// When a video is loaded using `NSItemProvider`'s [`loadFileRepresentation(forTypeIdentifier:completionHandler:)`](https://developer.apple.com/documentation/foundation/nsitemprovider/2888338-loadfilerepresentation), the system saves the video to a temporary file. When leaving the scope of that function's `completionHandler`, the temporary file is deleted. In order to get that file, this property is used to map the temporary `URL` to a new `URL` that the file will be moved to before the temporary file is deleted.
     var videoDestinationHandler: ((URL) -> URL?)? = nil
     
-    public init(selections: Binding<[PHSelectedObject]>, keepLivePhotosIntact: Bool = true, photoLibrary: PHPhotoLibrary? = nil, configurationHandler: ((_ config: inout PHPickerConfiguration) -> Void)? = nil) {
-        self._selections = selections
+    public init(
+        keepLivePhotosIntact: Bool = true,
+        photoLibrary: PHPhotoLibrary? = nil,
+        configurationHandler: ((_ config: inout PHPickerConfiguration) -> Void)? = nil,
+        onCompletion: @escaping (Result<[PHSelectedObject], Error>) -> Void
+    ) {
         self.keepLivePhotosIntact = keepLivePhotosIntact
+        self.completionHandler = onCompletion
         
         if let photoLibrary {
             self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
@@ -35,10 +41,14 @@ public struct PHPicker {
         }
     }
     
-    public init(selections: Binding<[PHSelectedObject]>, keepLivePhotosIntact: Bool = true, configuration: PHPickerConfiguration) {
-        self._selections = selections
+    public init(
+        keepLivePhotosIntact: Bool = true,
+        configuration: PHPickerConfiguration,
+        onCompletion: @escaping (_ selections: Result<[PHSelectedObject], Error>) -> Void
+    ) {
         self.keepLivePhotosIntact = keepLivePhotosIntact
         self.configuration = configuration
+        self.completionHandler = onCompletion
     }
     
     public func makeCoordinator() -> Coordinator {
@@ -110,8 +120,8 @@ extension PHPicker {
             
             Task { [keepLivePhotosIntact, destinationHandler] in
                 do {
-                    parent.selections = try await withThrowingTaskGroup(of: PHSelectedObject?.self,
-                                                                        returning: [PHSelectedObject].self) { taskGroup in
+                    let selections = try await withThrowingTaskGroup(of: PHSelectedObject?.self,
+                                                                     returning: [PHSelectedObject].self) { taskGroup in
                         for result in results {
                             taskGroup.addTask {
                                 let provider = result.itemProvider
@@ -156,8 +166,11 @@ extension PHPicker {
                             .compactMap { $0 }
                             .reduce(into: []) { $0.append($1) }
                     }
+                    
+                    parent.completionHandler(.success(selections))
                 } catch {
                     print("Error loading selections:", error as NSError)
+                    parent.completionHandler(.failure(error))
                 }
             }
         }
