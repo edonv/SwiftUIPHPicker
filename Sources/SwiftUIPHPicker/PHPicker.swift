@@ -23,7 +23,7 @@ public struct PHPicker {
     
     public init(
         keepLivePhotosIntact: Bool = true,
-        photoLibrary: PHPhotoLibrary? = nil,
+        photoLibrary: PHPhotoLibrary? = .shared(),
         configurationHandler: ((_ config: inout PHPickerConfiguration) -> Void)? = nil,
         onCompletion: @escaping (Result<[PHSelectedObject], Error>) -> Void
     ) {
