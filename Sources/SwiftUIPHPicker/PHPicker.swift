@@ -90,9 +90,14 @@ extension PHPicker {
         
         init(_ parent: PHPicker) {
             self.parent = parent
+            
+            print("PHImage readableTypeIdentifiersForItemProvider:", PHImage.readableTypeIdentifiersForItemProvider)
+            print("PHLivePhoto readableTypeIdentifiersForItemProvider:", PHLivePhoto.readableTypeIdentifiersForItemProvider)
         }
         
         public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            print("didFinishPicking results:", results)
+
             #if canImport(UIKit) && (os(iOS) || targetEnvironment(macCatalyst))
             picker.dismiss(animated: true)
             #endif
@@ -116,6 +121,7 @@ extension PHPicker {
                         for result in results {
                             taskGroup.addTask {
                                 let provider = result.itemProvider
+                                print("Start loading item:", provider.suggestedName)
                                 
                                 // Define functions for platform-specific behavior
                                 let checkIfProviderIsLivePhoto = { (_ provider: NSItemProvider) -> Bool in
