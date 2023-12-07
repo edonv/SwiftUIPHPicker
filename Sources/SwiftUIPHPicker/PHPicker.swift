@@ -110,6 +110,7 @@ extension PHPicker {
             
             Task { [keepLivePhotosIntact, destinationHandler] in
                 do {
+                    print("Started loading images")
                     parent.selections = try await withThrowingTaskGroup(of: PHSelectedObject?.self,
                                                                         returning: [PHSelectedObject].self) { taskGroup in
                         for result in results {
@@ -156,6 +157,8 @@ extension PHPicker {
                             .compactMap { $0 }
                             .reduce(into: []) { $0.append($1) }
                     }
+                    
+                    print("Finished loading selections")
                 } catch {
                     print("Error loading selections:", error as NSError)
                 }
