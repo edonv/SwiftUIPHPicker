@@ -23,15 +23,21 @@ import SwiftUIPHPicker
 
 struct ContentView: View {
     @State private var showPicker = false
-    @State private var pickerSelection = [PHSelectedObject]()
     
     var body: some View {
         Text("Hello world!")
             .sheet(isPresented: $showPicker) {
-                PHPicker(selections: $pickerSelection, photoLibrary: .shared())
-                    .maxSelectionCount(5)
-                    .filter(.all(of: [.images, .not(.livePhotos), .videos]))
-                    .videoDestinationDirectory(DOCUMENT DIRECTORY) /* more code needed for this */
+                PHPicker(photoLibrary: .shared()) { result in
+                    switch result {
+                    case .success(let selection):
+                        // Process selected assets
+                    case .failure(let error):
+                        // Deal with error
+                    }
+                }
+                .maxSelectionCount(5)
+                .filter(.all(of: [.images, .not(.livePhotos), .videos]))
+                .videoDestinationDirectory(DOCUMENT DIRECTORY) /* more code needed for this */
             }
     }
 }
