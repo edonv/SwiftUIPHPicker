@@ -24,41 +24,12 @@ public struct PHPicker {
     /// Create a `PHPicker`.
     /// - Parameters:
     ///   - keepLivePhotosIntact: When set to `true`, selected Live Photos are returned as a ``PHSelectedObject/livePhoto(fileName:image:)``. Otherwise, they're returned in the form of a ``PHSelectedObject/photo(fileName:image:)``.
-    ///   - photoLibrary: The library to use for the `PHPickerConfiguration`. This defaults to [`.shared()`](https://developer.apple.com/documentation/photokit/phphotolibrary/1620737-shared). If `nil`, the selected images' [`assetIdentifier`](https://developer.apple.com/documentation/photokit/phpickerresult/3606599-assetidentifier) won't be returned.
-    ///   - configurationHandler: A closure for changing parameter of [`configuration`](https://developer.apple.com/documentation/photokit/phpickerviewcontroller/3606605-configuration).
     ///   - onCompletion: A callback that will be invoked when the operation has succeeded or failed.
-    public init(
+    internal init(
         keepLivePhotosIntact: Bool = true,
-        photoLibrary: PHPhotoLibrary? = .shared(),
-        configurationHandler: ((_ config: inout PHPickerConfiguration) -> Void)? = nil,
         onCompletion: @escaping (_ result: Result<[PHSelectedObject], Error>) -> Void
     ) {
         self.keepLivePhotosIntact = keepLivePhotosIntact
-        self.completionHandler = onCompletion
-        
-        if let photoLibrary {
-            self.configuration = PHPickerConfiguration(photoLibrary: photoLibrary)
-        } else {
-            self.configuration = PHPickerConfiguration()
-        }
-        
-        if let configurationHandler {
-            configurationHandler(&configuration)
-        }
-    }
-    
-    /// Create a `PHPicker`.
-    /// - Parameters:
-    ///   - keepLivePhotosIntact: When set to `true`, selected Live Photos are returned as a ``PHSelectedObject/livePhoto(fileName:image:)``. Otherwise, they're returned in the form of a ``PHSelectedObject/photo(fileName:image:)``.
-    ///   - configuration: A configuration object for initializing the picker's [`configuration`](https://developer.apple.com/documentation/photokit/phpickerviewcontroller/3606605-configuration).
-    ///   - onCompletion: A callback that will be invoked when the operation has succeeded or failed.
-    public init(
-        keepLivePhotosIntact: Bool = true,
-        configuration: PHPickerConfiguration,
-        onCompletion: @escaping (_ result: Result<[PHSelectedObject], Error>) -> Void
-    ) {
-        self.keepLivePhotosIntact = keepLivePhotosIntact
-        self.configuration = configuration
         self.completionHandler = onCompletion
     }
     
