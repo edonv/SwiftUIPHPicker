@@ -8,6 +8,8 @@
 import SwiftUI
 import PhotosUI
 
+// MARK: - PHPickerConfigurationEnvironmentKey
+
 private struct PHPickerConfigurationEnvironmentKey: EnvironmentKey {
     static let defaultValue: PHPickerConfiguration = .init(photoLibrary: .shared())
 }
