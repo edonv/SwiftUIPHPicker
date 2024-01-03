@@ -12,7 +12,7 @@ I added support for more than 1 selection, as well as practical extensions, and 
 ## To-Do's
 - [x] Add support for multiple selections.
 - [ ] Add support for selecting other Live Photos (currently only supports standard photos).
-- [ ] Add support for videos.
+- [x] Add support for videos.
   - Currently, this works but requires the developer to use `videoDestination` or `videoDestinationDirectory`. Would it be better to just internally save it to the temporary directory and return that and require that they clean it up after?
 - [ ] Rework code to (by default) return `[PHPickerResult]`, then move async mapping code to `async` static function to do separately (or maybe as an extension on `[PHPickerResult]`?)
 
