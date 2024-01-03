@@ -21,6 +21,22 @@ extension EnvironmentValues {
     }
 }
 
+// MARK: - Video Destination
+
+private struct PHPickerVideoDestinationEnvironmentKey: EnvironmentKey {
+    static let defaultValue: ((URL) -> URL?)? = nil
+}
+
+extension EnvironmentValues {
+    /// This value must be used in the case of a video being selected from the picker.
+    ///
+    /// When a video is loaded using `NSItemProvider`'s [`loadFileRepresentation(forTypeIdentifier:completionHandler:)`](https://developer.apple.com/documentation/foundation/nsitemprovider/2888338-loadfilerepresentation), the system saves the video to a temporary file. When leaving the scope of that function's `completionHandler`, the temporary file is deleted. In order to get that file, this property is used to map the temporary `URL` to a new `URL` that the file will be moved to before the temporary file is deleted.
+    public var phPickerVideoDestination: ((URL) -> URL?)? {
+        get { self[PHPickerVideoDestinationEnvironmentKey.self] }
+        set { self[PHPickerVideoDestinationEnvironmentKey.self] = newValue }
+    }
+}
+
 extension View {
     /// Sets the `PHPickerConfiguration` property of the specified key path to the given value.
     /// - Parameters:
@@ -80,6 +96,36 @@ extension View {
     public func phPickerPreferredAssetRepresentationMode(_ mode: PHPickerConfiguration.AssetRepresentationMode) -> some View {
         self.transformEnvironment(\.phPickerConfiguration) { config in
             config.preferredAssetRepresentationMode = mode
+        }
+    }
+    
+    /// This modifier (or <doc:/documentation/SwiftUIPHPicker/SwiftUI/View/phPickerVideoDestinationDirectory(_:)>) must be called in the case of a video being selected from the picker.
+    ///
+    /// When a video is loaded using `NSItemProvider`'s [`loadFileRepresentation(forTypeIdentifier:completionHandler:)`](https://developer.apple.com/documentation/foundation/nsitemprovider/2888338-loadfilerepresentation), the system saves the video to a temporary file. When leaving the scope of that function's `completionHandler`, the temporary file is deleted. In order to access the file before it's deleted, <doc:/documentation/SwiftUIPHPicker/SwiftUI/EnvironmentValues/phPickerVideoDestination> is used to map the temporary `URL` to a new `URL` that the file will be moved to before access is lost.
+    ///
+    /// - Note: If you want to keep the file name the same and just move it to a specific directory, you can use <doc:/documentation/SwiftUIPHPicker/SwiftUI/View/phPickerVideoDestinationDirectory(_:)>.
+    /// - Parameter handler: A closure for mapping the temporary `URL` to a new `URL` where the video file should be saved.
+    public func phPickerVideoDestination(_ handler: ((_ temporaryURL: URL) -> URL?)?) -> some View {
+        self.environment(\.phPickerVideoDestination, handler)
+    }
+    
+    /// This modifier (or <doc:/documentation/SwiftUIPHPicker/SwiftUI/View/phPickerVideoDestination(_:)>) must be called in the case of a video being selected from the picker.
+    ///
+    /// When a video is loaded using `NSItemProvider`'s [`loadFileRepresentation(forTypeIdentifier:completionHandler:)`](https://developer.apple.com/documentation/foundation/nsitemprovider/2888338-loadfilerepresentation), the system saves the video to a temporary file. When leaving the scope of that function's `completionHandler`, the temporary file is deleted. In order to access the file before it's deleted, <doc:/documentation/SwiftUIPHPicker/SwiftUI/EnvironmentValues/phPickerVideoDestination> is used to map the temporary `URL` to a new `URL` that the file will be moved to before access is lost.
+    ///
+    /// This modifier sets the destination `URL` to the temporary `URL`'s file name within the provided `directoryURL` parameter.
+    ///
+    /// - Note: If you want to generate a destination `URL` for videos differently, use <doc:/documentation/SwiftUIPHPicker/SwiftUI/View/phPickerVideoDestination(_:)>.
+    /// - Parameter handler: A closure for mapping the temporary `URL` to a new `URL` where the video file should be saved.
+    public func phPickerVideoDestinationDirectory(_ directoryURL: URL?) -> some View {
+        self.phPickerVideoDestination { temporaryURL in
+            if #available(iOS 16, macCatalyst 16, macOS 13, *) {
+                return directoryURL?
+                    .appending(component: temporaryURL.lastPathComponent, directoryHint: .notDirectory)
+            } else {
+                return directoryURL?
+                    .appendingPathComponent(temporaryURL.lastPathComponent, isDirectory: false)
+            }
         }
     }
 }

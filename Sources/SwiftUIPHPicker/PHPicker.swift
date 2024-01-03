@@ -12,15 +12,13 @@ public struct PHPicker {
     @Environment(\.phPickerConfiguration)
     private var phPickerConfiguration
     
+    @Environment(\.phPickerVideoDestination)
+    private var phPickerVideoDestination
+    
     var completionHandler: (Result<[PHSelectedObject], Error>) -> Void
     
     /// When set to `true`, selected Live Photos are returned as a ``PHSelectedObject/livePhoto(fileName:image:)``. Otherwise, they're returned in the form of a ``PHSelectedObject/photo(fileName:image:)``.
     var keepLivePhotosIntact: Bool = true
-    
-    /// This property must be used in the case of a video being selected from the picker.
-    ///
-    /// When a video is loaded using `NSItemProvider`'s [`loadFileRepresentation(forTypeIdentifier:completionHandler:)`](https://developer.apple.com/documentation/foundation/nsitemprovider/2888338-loadfilerepresentation), the system saves the video to a temporary file. When leaving the scope of that function's `completionHandler`, the temporary file is deleted. In order to get that file, this property is used to map the temporary `URL` to a new `URL` that the file will be moved to before the temporary file is deleted.
-    var videoDestinationHandler: ((URL) -> URL?)? = nil
     
     /// Create a `PHPicker`.
     /// - Parameters:
@@ -93,7 +91,7 @@ extension PHPicker {
         
         private func asyncLoadSelectedImages(from results: [PHPickerResult]) {
             let keepLivePhotosIntact = parent.keepLivePhotosIntact
-            let destinationHandler = parent.videoDestinationHandler
+            let destinationHandler = parent.phPickerVideoDestination
             
             Task { [keepLivePhotosIntact, destinationHandler] in
                 do {
