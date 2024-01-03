@@ -9,7 +9,8 @@ import PhotosUI
 import SwiftUI
 
 public struct PHPicker {
-    private(set) var configuration: PHPickerConfiguration
+    @Environment(\.phPickerConfiguration)
+    private var phPickerConfiguration
     
     var completionHandler: (Result<[PHSelectedObject], Error>) -> Void
     
@@ -36,12 +37,6 @@ public struct PHPicker {
     public func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
-    public func configuration(_ handler: (_ config: inout PHPickerConfiguration) -> Void) -> PHPicker {
-        var newView = self
-        handler(&newView.configuration)
-        return newView
-    }
 }
 
 #if canImport(UIKit)
@@ -49,7 +44,7 @@ import UIKit
 
 extension PHPicker: UIViewControllerRepresentable {
     public func makeUIViewController(context: Context) -> PHPickerViewController {
-        let picker = PHPickerViewController(configuration: self.configuration)
+        let picker = PHPickerViewController(configuration: context.environment.phPickerConfiguration)
         picker.delegate = context.coordinator
         return picker
     }
@@ -65,7 +60,7 @@ import Cocoa
 
 extension PHPicker: NSViewControllerRepresentable {
     public func makeNSViewController(context: Context) -> PHPickerViewController {
-        let picker = PHPickerViewController(configuration: self.configuration)
+        let picker = PHPickerViewController(configuration: context.environment.phPickerConfiguration)
         picker.delegate = context.coordinator
         return picker
     }
