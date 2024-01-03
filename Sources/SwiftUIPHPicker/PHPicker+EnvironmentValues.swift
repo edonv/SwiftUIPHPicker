@@ -44,7 +44,7 @@ extension View {
     ///
     /// The default value is `1`. Setting the value to `0` or `nil` sets the selection limit to the maximum that the system supports.
     /// - Parameter limit: The new maximum number of selections the user can make.
-    public func maxSelectionCount(_ limit: Int?) -> some View {
+    public func phPickerMaxSelectionCount(_ limit: Int?) -> some View {
         self.transformEnvironment(\.phPickerConfiguration) { config in
             config.selectionLimit = limit ?? 0
         }
@@ -53,7 +53,7 @@ extension View {
     /// Sets the selection behavior for the picker.
     /// - Parameter behavior: The new selection behavior for the picker.
     @available(iOS 15, macCatalyst 15, macOS 13, *)
-    public func selectionBehavior(_ behavior: PHPickerConfiguration.Selection) -> some View {
+    public func phPickerSelectionBehavior(_ behavior: PHPickerConfiguration.Selection) -> some View {
         self.transformEnvironment(\.phPickerConfiguration) { config in
             config.selection = behavior
         }
@@ -63,7 +63,7 @@ extension View {
     ///
     /// By default, a configuration object displays all asset types: images, Live Photos, and videos.
     /// - Parameter filter: The new filter applied to restrict the asset types the picker displays.
-    public func filter(_ filter: PHPickerFilter?) -> some View {
+    public func phPickerFilter(_ filter: PHPickerFilter?) -> some View {
         self.transformEnvironment(\.phPickerConfiguration) { config in
             config.filter = filter
         }
@@ -75,7 +75,7 @@ extension View {
     ///
     /// The system may perform additional transcoding to convert the asset you request to the compatable representation. Use [`PHPickerConfiguration.AssetRepresentationMode.current`](https://developer.apple.com/documentation/photokit/phpickerconfiguration/assetrepresentationmode/current) to avoid transcoding, if possible.
     /// - Parameter mode: The new mode that determines which representation to use if an asset contains more than one.
-    public func preferredAssetRepresentationMode(_ mode: PHPickerConfiguration.AssetRepresentationMode) -> some View {
+    public func phPickerPreferredAssetRepresentationMode(_ mode: PHPickerConfiguration.AssetRepresentationMode) -> some View {
         self.transformEnvironment(\.phPickerConfiguration) { config in
             config.preferredAssetRepresentationMode = mode
         }
